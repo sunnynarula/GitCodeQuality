@@ -1,0 +1,33 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
+}
+
+version = '1.0-SNAPSHOT'
+
+def javafxVersion = '21.0.1'
+def jgitVersion = '6.7.0.202309050840-r'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation "org.openjfx:javafx-controls:${javafxVersion}"
+    implementation "org.eclipse.jgit:org.eclipse.jgit:${jgitVersion}"
+}
+
+javafx {
+    version = javafxVersion
+    modules = [ 'javafx.controls' ]
+}
+
+application {
+    mainClass = 'Main'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
