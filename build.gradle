@@ -1,7 +1,7 @@
 plugins {
     id 'java'
     id 'application'
-    id 'org.openjfx.javafxplugin' version '0.0.13'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
 }
 
 version = '1.0-SNAPSHOT'
@@ -24,7 +24,7 @@ javafx {
 }
 
 application {
-    mainClass = 'Main'
+    mainClass = 'com.voidtoverse.Main'
 }
 
 java {
