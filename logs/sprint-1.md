@@ -4,3 +4,4 @@
 - Wrote initial architecture document describing planned modules.
 - Implemented a simple JavaFX window launched from `Main`.
 - Verified build with Gradle; no tests yet.
+- Added mock UI with commit quality banner, message box and buttons.

@@ -16,4 +16,6 @@ This document describes the planned modules for the GitCodeQuality application. 
 2. The picker lists recent repositories from storage.
 3. Choosing a repository loads the history view.
 
-Additional modules such as staging and scoring will be added in later sprints.
+Sprint 1 uses a placeholder mini UI displaying commit quality, a text area for
+messages and three buttons (Commit, Advanced, Switch). Additional modules such
+as staging and scoring will be added in later sprints.
