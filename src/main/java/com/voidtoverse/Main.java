@@ -1,19 +1,17 @@
 package com.voidtoverse;
 
+import com.voidtoverse.ui.CommitQualityFrame;
 import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 /**
- * Entry point showing a basic JavaFX window.
+ * Entry point launching the GitCodeQuality application.
  */
 public class Main extends Application {
     @Override
     public void start(Stage stage) {
-        Label label = new Label("GitCodeQuality - Sprint 1");
-        stage.setScene(new Scene(label, 300, 200));
-        stage.setTitle("GitCodeQuality");
+        // delegate UI creation to separate class
+        CommitQualityFrame.setup(stage);
         stage.show();
     }
 
