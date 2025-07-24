@@ -1,5 +1,10 @@
 {
-  "build": "success",
-  "tests": "none"
+  "tests": [
+    {
+      "name": "QualityDescriptor mapping",
+      "total": 5,
+      "passed": 5,
+      "details": "All emoji mappings returned the expected values."
+    }
+  ]
 }
-
