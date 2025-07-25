@@ -53,18 +53,14 @@ public class Main extends Application {
         stage.show();
 
         // Persist the window layout whenever it changes so that it can be restored on next launch
-        stage.xProperty().addListener((obs, oldVal, newVal) -> {
-            Persistence.saveWindowLayout(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
-        });
-        stage.yProperty().addListener((obs, oldVal, newVal) -> {
-            Persistence.saveWindowLayout(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
-        });
-        stage.widthProperty().addListener((obs, oldVal, newVal) -> {
-            Persistence.saveWindowLayout(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
-        });
-        stage.heightProperty().addListener((obs, oldVal, newVal) -> {
-            Persistence.saveWindowLayout(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
-        });
+        stage.xProperty().addListener((obs, oldVal, newVal) ->
+                Persistence.saveWindowLayout(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight()));
+        stage.yProperty().addListener((obs, oldVal, newVal) ->
+                Persistence.saveWindowLayout(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight()));
+        stage.widthProperty().addListener((obs, oldVal, newVal) ->
+                Persistence.saveWindowLayout(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight()));
+        stage.heightProperty().addListener((obs, oldVal, newVal) ->
+                Persistence.saveWindowLayout(stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight()));
     }
 
     public static void main(String[] args) {
