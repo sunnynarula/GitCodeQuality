@@ -26,18 +26,19 @@ public final class HistoryViewer {
      */
     public static void showHistory(Stage owner, File repo) {
         List<String> commits = new ArrayList<>();
-        try {
-            ProcessBuilder pb = new ProcessBuilder("git", "log", "--oneline", "-n", "50");
-            pb.directory(repo);
-            Process process = pb.start();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    commits.add(line);
+        if (repo != null) {
+            try {
+                // Use JGit to retrieve the last 50 commits in abbreviated form
+                org.eclipse.jgit.api.Git git = org.eclipse.jgit.api.Git.open(repo);
+                Iterable<org.eclipse.jgit.revwalk.RevCommit> logs = git.log().setMaxCount(50).call();
+                for (org.eclipse.jgit.revwalk.RevCommit commit : logs) {
+                    String abbrev = commit.getId().abbreviate(7).name();
+                    commits.add(abbrev + " " + commit.getShortMessage());
                 }
+                git.close();
+            } catch (Exception e) {
+                // ignore errors; fall back to empty history
             }
-        } catch (IOException e) {
-            // ignore errors
         }
         ListView<String> listView = new ListView<>();
         listView.getItems().addAll(commits);

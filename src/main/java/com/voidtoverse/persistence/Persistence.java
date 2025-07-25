@@ -25,6 +25,9 @@ public final class Persistence {
     private static final String CONFIG_DIR = System.getProperty("user.home") + "/.gitgui";
     private static final String RECENT_FILE = CONFIG_DIR + "/recent_repos.json";
 
+    // file storing the last opened repository path
+    private static final String USER_SETTINGS_FILE = CONFIG_DIR + "/user-settings.json";
+
     private Persistence() {}
 
     /**
@@ -82,6 +85,47 @@ public final class Persistence {
             }
         } catch (IOException e) {
             // silently ignore write failures
+        }
+    }
+
+    /**
+     * Load the last selected repository path from the user settings file.
+     *
+     * @return the path to the last repository, or {@code null} if none is stored
+     */
+    public static String loadLastRepository() {
+        Path path = Paths.get(USER_SETTINGS_FILE);
+        if (!Files.exists(path)) {
+            return null;
+        }
+        try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            String line = reader.readLine();
+            if (line != null && !line.isBlank()) {
+                return line.trim();
+            }
+        } catch (IOException e) {
+            // ignore and return null
+        }
+        return null;
+    }
+
+    /**
+     * Persist the path of the last selected repository.
+     *
+     * @param repo absolute path of the selected repository
+     */
+    public static void saveLastRepository(String repo) {
+        try {
+            Path dir = Paths.get(CONFIG_DIR);
+            if (!Files.exists(dir)) {
+                Files.createDirectories(dir);
+            }
+            Path file = Paths.get(USER_SETTINGS_FILE);
+            try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
+                writer.write(repo == null ? "" : repo);
+            }
+        } catch (IOException e) {
+            // ignore write failures
         }
     }
 

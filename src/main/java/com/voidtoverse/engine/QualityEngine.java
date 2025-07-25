@@ -29,37 +29,51 @@ public final class QualityEngine {
     }
 
     /**
-     * Run `git diff --shortstat --cached` and parse the file, insertion and deletion counts.
+     * Compute diff statistics for staged changes using the JGit library.
      *
-     * <p>If the command fails or produces no output, zeros are returned.</p>
+     * <p>The returned array contains the number of files changed, insertions and deletions.
+     * If JGit fails to compute the diff (e.g. repository not found or other errors), the
+     * statistics will be zeroed.</p>
      *
      * @param repo the repository directory
      * @return an array where index 0 is files changed, 1 is insertions, 2 is deletions
      */
     private static int[] parseDiffStats(File repo) {
         int[] stats = new int[] {0, 0, 0};
+        if (repo == null) {
+            return stats;
+        }
         try {
-            ProcessBuilder pb = new ProcessBuilder("git", "diff", "--shortstat", "--cached");
-            pb.directory(repo);
-            Process process = pb.start();
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-                String line = reader.readLine();
-                if (line != null) {
-                    Pattern pattern = Pattern.compile("(\\d+) file[s]? changed(, (\\d+) insertion[s]?\\(\\+\\))?(, (\\d+) deletion[s]?\\(-\\))?");
-                    Matcher matcher = pattern.matcher(line.trim());
-                    if (matcher.find()) {
-                        stats[0] = Integer.parseInt(matcher.group(1));
-                        if (matcher.group(3) != null) {
-                            stats[1] = Integer.parseInt(matcher.group(3));
-                        }
-                        if (matcher.group(5) != null) {
-                            stats[2] = Integer.parseInt(matcher.group(5));
-                        }
+            // Open the repository using JGit
+            org.eclipse.jgit.api.Git git = org.eclipse.jgit.api.Git.open(repo);
+            // Obtain the list of diffs between HEAD and the index (staged changes)
+            java.util.List<org.eclipse.jgit.diff.DiffEntry> diffs = git.diff().setCached(true).call();
+            // Prepare a DiffFormatter to compute insertions and deletions per file
+            org.eclipse.jgit.diff.DiffFormatter formatter = new org.eclipse.jgit.diff.DiffFormatter(new java.io.ByteArrayOutputStream());
+            formatter.setRepository(git.getRepository());
+            int files = 0;
+            int insertions = 0;
+            int deletions = 0;
+            for (org.eclipse.jgit.diff.DiffEntry diff : diffs) {
+                files++;
+                try {
+                    org.eclipse.jgit.diff.FileHeader header = formatter.toFileHeader(diff);
+                    org.eclipse.jgit.diff.EditList edits = header.toEditList();
+                    for (org.eclipse.jgit.diff.Edit edit : edits) {
+                        insertions += edit.getEndB() - edit.getBeginB();
+                        deletions += edit.getEndA() - edit.getBeginA();
                     }
+                } catch (org.eclipse.jgit.errors.LargeObjectException e) {
+                    // Skip large objects but count the file itself
                 }
             }
-        } catch (IOException e) {
-            // ignore and return zeros
+            formatter.close();
+            git.close();
+            stats[0] = files;
+            stats[1] = insertions;
+            stats[2] = deletions;
+        } catch (Exception e) {
+            // ignore and leave stats zeroed
         }
         return stats;
     }

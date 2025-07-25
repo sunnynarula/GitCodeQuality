@@ -2,6 +2,7 @@ package com.voidtoverse;
 
 import com.voidtoverse.ui.CommitQualityFrame;
 import com.voidtoverse.ui.RepoPicker;
+import com.voidtoverse.persistence.Persistence;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -17,14 +18,17 @@ import javafx.stage.Stage;
 public class Main extends Application {
     @Override
     public void start(Stage stage) {
-        // Present repository selection dialog before launching main UI
-        java.io.File repo = RepoPicker.chooseRepository(stage);
-        if (repo == null) {
-            // user cancelled; do not open the app
-            stage.close();
-            return;
+        // Attempt to restore the last opened repository
+        String lastRepoPath = Persistence.loadLastRepository();
+        java.io.File repo = null;
+        if (lastRepoPath != null) {
+            java.io.File candidate = new java.io.File(lastRepoPath);
+            if (candidate.exists() && candidate.isDirectory()) {
+                repo = candidate;
+            }
         }
-        // pass selected repo into commit quality frame
+        // Configure the UI regardless of whether a repository is known. When repo is null
+        // the frame will display a placeholder and disable commit controls.
         CommitQualityFrame.setup(stage, repo);
         stage.show();
     }

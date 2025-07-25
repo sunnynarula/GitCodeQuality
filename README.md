@@ -4,16 +4,41 @@ GitCodeQuality is a desktop helper for developers striving to craft small, well�
 
 ## Features
 
-- **Repository Picker:** On launch you are prompted to choose a local Git repository. The most recently opened paths are stored under `~/.gitgui/recent_repos.json`.
+- **Repository Picker:** The application remembers the last repository you worked in and restores it on launch. If no repository has been selected yet, the main window displays “No git repository selected”. Use the **Switch** button to select from a list of recent repositories or browse to a new one. Recent paths are stored under `~/.gitgui/recent_repos.json` and the last selection is persisted in `~/.gitgui/user-settings.json`.
+
 - **Commit Quality Meter:** A banner in the main window shows an emoji, percentage and message describing the quality of your staged changes. Quality is computed using the formula described in the project specification【61889244827154†L18-L30】.
+
 - **Commit Button:** Stage all modified files, commit them using your message, then recompute quality. Exception keywords (`refactor:`, `bulk rename`, `initial commit`) bypass the scoring and award a perfect rating.
-- **History Viewer:** Click the “Advanced” button to view the last 50 commits in the current repository.
+
+- **History Viewer:** Click the **Advanced** button to view the last 50 commits in the current repository.
+
+- **JGit Integration:** Internally the application uses the [JGit](https://www.eclipse.org/jgit/) library for Git operations such as staging, committing, diffing and retrieving history. No external `git` binary is required at runtime.
 
 ## Usage
 
-To run the application you need a Java 17 runtime and JavaFX modules. Compile the sources under `src/main/java` and launch `com.voidtoverse.Main`. When prompted, select a Git repository. Make changes, stage and commit them via the GUI. The quality banner will update after each commit.
+To run the application you need a Java 17 runtime, JavaFX modules and the JGit library on the classpath. Compile the sources under `src/main/java` and launch `com.voidtoverse.Main`. On first launch you will see “No git repository selected”. Click the **Switch** button to choose a repository. Once a repository is selected, make changes, stage and commit them via the GUI. The quality banner will update after each commit.
 
-> **Note:** This project uses the system `git` executable to compute diffs and make commits. Ensure `git` is available on your PATH and that your name and email are configured (e.g. via `git config --global user.name`).
+You can manage your Git user name and email via the standard `git config` commands. JGit honours your existing `.gitconfig` settings.
+
+### Adding JGit to your build
+
+GitCodeQuality depends on the JGit library to interact with repositories. If you are using Maven, include the following dependency:
+
+```xml
+<dependency>
+  <groupId>org.eclipse.jgit</groupId>
+  <artifactId>org.eclipse.jgit</artifactId>
+  <version>6.8.0.20231129</version>
+</dependency>
+```
+
+For Gradle, add:
+
+```groovy
+implementation 'org.eclipse.jgit:org.eclipse.jgit:6.8.0.20231129'
+```
+
+Alternatively, download the JGit jar from the Eclipse update site and add it to your project's classpath.
 
 ## Structure
 

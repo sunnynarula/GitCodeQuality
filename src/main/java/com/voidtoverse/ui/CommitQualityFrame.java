@@ -26,41 +26,80 @@ public final class CommitQualityFrame {
      * @param stage JavaFX stage to populate
      */
     public static void setup(Stage stage, java.io.File repo) {
-        // compute quality for the current staged changes
-        com.voidtoverse.engine.QualityEngine.Result result = com.voidtoverse.engine.QualityEngine.calculateQuality(repo);
-        String[] desc = com.voidtoverse.engine.QualityDescriptor.describe(result.quality);
-        Label quality = new Label(desc[0] + " Commit Quality: " + result.quality + "% — \"" + desc[1] + "\"");
+        // Clear existing scene content before rebuilding
+        // Determine the window title based on whether a repository is selected
+        String title = "GitCodeQuality";
+        if (repo != null) {
+            title += " - " + repo.getAbsolutePath();
+        }
+        stage.setTitle(title);
+
+        // Define UI components
+        Label qualityLabel;
         Label msgLabel = new Label("Commit Message:");
         TextArea msgBox = new TextArea();
         Button commitBtn = new Button("Commit");
         Button advancedBtn = new Button("Advanced");
         Button switchBtn = new Button("Switch");
+
+        // If a repository is selected, compute the current commit quality
+        if (repo != null) {
+            com.voidtoverse.engine.QualityEngine.Result result = com.voidtoverse.engine.QualityEngine.calculateQuality(repo);
+            String[] desc = com.voidtoverse.engine.QualityDescriptor.describe(result.quality);
+            qualityLabel = new Label(desc[0] + " Commit Quality: " + result.quality + "% — \"" + desc[1] + "\"");
+            commitBtn.setDisable(false);
+            advancedBtn.setDisable(false);
+        } else {
+            // No repository selected: show a placeholder message and disable commit/history features
+            qualityLabel = new Label("No git repository selected");
+            commitBtn.setDisable(true);
+            advancedBtn.setDisable(true);
+        }
+
         HBox controls = new HBox(10, commitBtn, advancedBtn, switchBtn);
-        VBox root = new VBox(10, quality, msgLabel, msgBox, controls);
+        VBox root = new VBox(10, qualityLabel, msgLabel, msgBox, controls);
         stage.setScene(new Scene(root, 500, 300));
-        stage.setTitle("GitCodeQuality");
+
+        // Handler for the switch button: prompt the user to select from recents or browse
+        switchBtn.setOnAction(evt -> {
+            java.io.File chosen = com.voidtoverse.ui.RepoPicker.chooseFromRecentList(stage);
+            if (chosen != null) {
+                // Persist the last selected repository
+                com.voidtoverse.persistence.Persistence.saveLastRepository(chosen.getAbsolutePath());
+                // Rebuild the UI with the new repository
+                setup(stage, chosen);
+            }
+        });
 
         // Show commit history when advanced button is clicked
         advancedBtn.setOnAction(evt -> {
-            com.voidtoverse.ui.HistoryViewer.showHistory(stage, repo);
+            if (repo != null) {
+                com.voidtoverse.ui.HistoryViewer.showHistory(stage, repo);
+            }
         });
 
         // Commit action: stage and commit all changes then refresh quality
         commitBtn.setOnAction(evt -> {
+            // Guard against null repo (should be disabled anyway)
+            if (repo == null) {
+                return;
+            }
             String message = msgBox.getText().trim();
             if (message.isEmpty()) {
                 return;
             }
             try {
-                ProcessBuilder pbAdd = new ProcessBuilder("git", "add", "-A");
-                pbAdd.directory(repo);
-                pbAdd.start().waitFor();
-                ProcessBuilder pbCommit = new ProcessBuilder("git", "commit", "-m", message);
-                pbCommit.directory(repo);
-                pbCommit.start().waitFor();
+                // Use JGit API to stage and commit all changes
+                org.eclipse.jgit.api.Git git = org.eclipse.jgit.api.Git.open(repo);
+                // Add all changes
+                git.add().addFilepattern(".").call();
+                // Perform commit
+                git.commit().setMessage(message).call();
+                git.close();
             } catch (Exception e) {
-                // ignore commit errors
+                // ignore commit errors silently
             }
+            // Recalculate quality after commit
             com.voidtoverse.engine.QualityEngine.Result r = com.voidtoverse.engine.QualityEngine.calculateQuality(repo);
             int qualityValue = r.quality;
             // if the commit message contains one of the exception keywords, force 100 quality
@@ -69,7 +108,7 @@ public final class CommitQualityFrame {
                 qualityValue = 100;
             }
             String[] newDesc = com.voidtoverse.engine.QualityDescriptor.describe(qualityValue);
-            quality.setText(newDesc[0] + " Commit Quality: " + qualityValue + "% — \"" + newDesc[1] + "\"");
+            qualityLabel.setText(newDesc[0] + " Commit Quality: " + qualityValue + "% — \"" + newDesc[1] + "\"");
             msgBox.clear();
         });
     }
