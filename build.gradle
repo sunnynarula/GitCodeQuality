@@ -6,7 +6,7 @@ plugins {
 
 version = '1.0-SNAPSHOT'
 
-def javafxVersion = '21.0.1'
+def javafxVersion = '21.0.2'
 def jgitVersion = '6.7.0.202309050840-r'
 
 repositories {
