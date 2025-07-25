@@ -1,5 +1,7 @@
 package com.voidtoverse.ui;
 
+import com.voidtoverse.engine.QualityEngine;
+import com.voidtoverse.engine.QualityEngine.Result;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -7,6 +9,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.eclipse.jgit.api.Git;
 
 /**
  * Sets up the main window showing commit quality information and controls.
@@ -44,7 +47,7 @@ public final class CommitQualityFrame {
 
         // If a repository is selected, compute the current commit quality
         if (repo != null) {
-            com.voidtoverse.engine.QualityEngine.Result result = com.voidtoverse.engine.QualityEngine.calculateQuality(repo);
+            Result result = QualityEngine.calculateQuality(repo);
             String[] desc = com.voidtoverse.engine.QualityDescriptor.describe(result.quality());
             qualityLabel = new Label(desc[0] + " Commit Quality: " + result.quality() + "% — \"" + desc[1] + "\"");
             commitBtn.setDisable(false);
@@ -90,7 +93,7 @@ public final class CommitQualityFrame {
             }
             try {
                 // Use JGit API to stage and commit all changes
-                org.eclipse.jgit.api.Git git = org.eclipse.jgit.api.Git.open(repo);
+                Git git = Git.open(repo);
                 // Add all changes
                 git.add().addFilepattern(".").call();
                 // Perform commit
@@ -100,7 +103,7 @@ public final class CommitQualityFrame {
                 // ignore commit errors silently
             }
             // Recalculate quality after commit
-            com.voidtoverse.engine.QualityEngine.Result r = com.voidtoverse.engine.QualityEngine.calculateQuality(repo);
+            Result r = QualityEngine.calculateQuality(repo);
             int qualityValue = r.quality();
             // if the commit message contains one of the exception keywords, force 100 quality
             String lower = message.toLowerCase();
