@@ -6,9 +6,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.geometry.Rectangle2D;
+import javafx.stage.Screen;
 import org.eclipse.jgit.api.Git;
 
 /**
@@ -61,7 +64,8 @@ public final class CommitQualityFrame {
 
         HBox controls = new HBox(10, commitBtn, advancedBtn, switchBtn);
         VBox root = new VBox(10, qualityLabel, msgLabel, msgBox, controls);
-        stage.setScene(new Scene(root, 500, 300));
+        Scene scene = new Scene(root, 500, 300);
+        stage.setScene(scene);
 
         // Handler for the switch button: prompt the user to select from recents or browse
         switchBtn.setOnAction(evt -> {
@@ -113,6 +117,22 @@ public final class CommitQualityFrame {
             String[] newDesc = com.voidtoverse.engine.QualityDescriptor.describe(qualityValue);
             qualityLabel.setText(newDesc[0] + " Commit Quality: " + qualityValue + "% — \"" + newDesc[1] + "\"");
             msgBox.clear();
+        });
+
+        // Listen for F12 to reset the window size and position and clear the saved layout
+        scene.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.F12) {
+                // Remove any persisted layout so that next launch uses default
+                com.voidtoverse.persistence.Persistence.clearWindowLayout();
+                // Reset to default size and top-right placement
+                Rectangle2D bounds = Screen.getPrimary().getVisualBounds();
+                double defaultWidth = 500;
+                double defaultHeight = 300;
+                stage.setWidth(defaultWidth);
+                stage.setHeight(defaultHeight);
+                stage.setX(bounds.getMaxX() - defaultWidth);
+                stage.setY(0);
+            }
         });
     }
 }

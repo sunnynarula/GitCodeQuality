@@ -28,6 +28,9 @@ public final class Persistence {
     // file storing the last opened repository path
     private static final String USER_SETTINGS_FILE = CONFIG_DIR + "/user-settings.json";
 
+    // file storing the last window layout (x,y,width,height)
+    private static final String WINDOW_LAYOUT_FILE = CONFIG_DIR + "/window-layout.json";
+
     private Persistence() {}
 
     /**
@@ -126,6 +129,73 @@ public final class Persistence {
             }
         } catch (IOException e) {
             // ignore write failures
+        }
+    }
+
+    /**
+     * Load the last saved window layout.
+     *
+     * <p>The layout file stores four comma-separated values: x, y, width and height. If the file
+     * does not exist or cannot be parsed, this method returns {@code null} to indicate there is no
+     * previously saved layout.</p>
+     *
+     * @return an array of four doubles [x, y, width, height] or {@code null} if no layout is saved
+     */
+    public static double[] loadWindowLayout() {
+        Path path = Paths.get(WINDOW_LAYOUT_FILE);
+        if (!Files.exists(path)) {
+            return null;
+        }
+        try (BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            String line = reader.readLine();
+            if (line != null && !line.isBlank()) {
+                String[] parts = line.trim().split(",");
+                if (parts.length == 4) {
+                    double[] vals = new double[4];
+                    for (int i = 0; i < 4; i++) {
+                        vals[i] = Double.parseDouble(parts[i]);
+                    }
+                    return vals;
+                }
+            }
+        } catch (Exception e) {
+            // ignore parse errors and fall through
+        }
+        return null;
+    }
+
+    /**
+     * Persist the window layout (position and size).
+     *
+     * @param x the x coordinate of the window
+     * @param y the y coordinate of the window
+     * @param width the width of the window
+     * @param height the height of the window
+     */
+    public static void saveWindowLayout(double x, double y, double width, double height) {
+        try {
+            Path dir = Paths.get(CONFIG_DIR);
+            if (!Files.exists(dir)) {
+                Files.createDirectories(dir);
+            }
+            Path file = Paths.get(WINDOW_LAYOUT_FILE);
+            try (BufferedWriter writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
+                writer.write(x + "," + y + "," + width + "," + height);
+            }
+        } catch (IOException e) {
+            // ignore write failures
+        }
+    }
+
+    /**
+     * Remove any persisted window layout settings. Calling this will cause the next launch to
+     * revert to the default window size and position.
+     */
+    public static void clearWindowLayout() {
+        try {
+            Files.deleteIfExists(Paths.get(WINDOW_LAYOUT_FILE));
+        } catch (IOException e) {
+            // ignore delete errors
         }
     }
 
