@@ -1,11 +1,14 @@
 package com.voidtoverse.engine;
 
-import java.io.BufferedReader;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.diff.DiffEntry;
+import org.eclipse.jgit.diff.DiffFormatter;
+import org.eclipse.jgit.diff.EditList;
+import org.eclipse.jgit.errors.LargeObjectException;
+import org.eclipse.jgit.patch.FileHeader;
+
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.List;
 
 /**
  * Computes commit quality scores based on the size of staged changes.
@@ -45,25 +48,25 @@ public final class QualityEngine {
         }
         try {
             // Open the repository using JGit
-            org.eclipse.jgit.api.Git git = org.eclipse.jgit.api.Git.open(repo);
+            Git git = Git.open(repo);
             // Obtain the list of diffs between HEAD and the index (staged changes)
-            java.util.List<org.eclipse.jgit.diff.DiffEntry> diffs = git.diff().setCached(true).call();
+            List<DiffEntry> diffs = git.diff().setCached(true).call();
             // Prepare a DiffFormatter to compute insertions and deletions per file
-            org.eclipse.jgit.diff.DiffFormatter formatter = new org.eclipse.jgit.diff.DiffFormatter(new java.io.ByteArrayOutputStream());
+            DiffFormatter formatter = new DiffFormatter(new java.io.ByteArrayOutputStream());
             formatter.setRepository(git.getRepository());
             int files = 0;
             int insertions = 0;
             int deletions = 0;
-            for (org.eclipse.jgit.diff.DiffEntry diff : diffs) {
+            for (DiffEntry diff : diffs) {
                 files++;
                 try {
-                    org.eclipse.jgit.diff.FileHeader header = formatter.toFileHeader(diff);
-                    org.eclipse.jgit.diff.EditList edits = header.toEditList();
+                    FileHeader header = formatter.toFileHeader(diff);
+                    EditList edits = header.toEditList();
                     for (org.eclipse.jgit.diff.Edit edit : edits) {
                         insertions += edit.getEndB() - edit.getBeginB();
                         deletions += edit.getEndA() - edit.getBeginA();
                     }
-                } catch (org.eclipse.jgit.errors.LargeObjectException e) {
+                } catch (LargeObjectException e) {
                     // Skip large objects but count the file itself
                 }
             }

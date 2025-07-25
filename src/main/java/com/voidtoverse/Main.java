@@ -1,7 +1,6 @@
 package com.voidtoverse;
 
 import com.voidtoverse.ui.CommitQualityFrame;
-import com.voidtoverse.ui.RepoPicker;
 import com.voidtoverse.persistence.Persistence;
 import javafx.application.Application;
 import javafx.stage.Stage;
