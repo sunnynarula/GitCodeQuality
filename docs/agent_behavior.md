@@ -49,7 +49,7 @@ Use `~/.gitgui/` for user‑specific settings like themes and badge progress【6
   - Include:
     - Status: open/in-progress/fixed【615593083309513†L48-L53】
     - What failed【615593083309513†L50-L53】
-    - Repro steps【615593083309513†L50-L53】
+    - Reproduction steps【615593083309513†L50-L53】
     - Fix attempts so far【615593083309513†L50-L53】
   - Continue to next sprint even if bug not resolved【615593083309513†L53-L55】.
 
@@ -60,7 +60,7 @@ Use `~/.gitgui/` for user‑specific settings like themes and badge progress【6
 These must always be present and updated:
 
 | File                           | Purpose                      |
-| ------------------------------ | ---------------------------- |
+|--------------------------------|------------------------------|
 | `README.md`                    | How to use the app           |
 | `docs/architecture.md`         | Modules, UI flows, services  |
 | `docs/design-decisions.md`     | Why + how                    |

@@ -20,15 +20,9 @@ public final class QualityEngine {
     private QualityEngine() {}
 
     /**
-     * Holds the results of a quality computation.
-     */
-    public static class Result {
-        public final int quality;
-        public final int score;
-        public Result(int quality, int score) {
-            this.quality = quality;
-            this.score = score;
-        }
+         * Holds the results of a quality computation.
+         */
+        public record Result(int quality, int score) {
     }
 
     /**

@@ -12,8 +12,4 @@
 *.log
 
 # Ignore all jar and class files
-//*.jar
 *.class
-
-# Gradle wrapper binary
-//gradle/wrapper/gradle-wrapper.jar

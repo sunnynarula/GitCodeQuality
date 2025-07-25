@@ -23,7 +23,7 @@ The project will be based on JavaFX and JGit
 - Scores mapped to emojis and messages【61889244827154†L20-L29】:
 
 | Score  | Emoji | Message                                          |
-| ------ | ----- | ------------------------------------------------ |
+|--------|-------|--------------------------------------------------|
 | 90–100 | 😄    | Perfect size. Just like grandma used to commit.  |
 | 70–89  | 🙂    | Solid job! Clean and focused.                    |
 | 50–69  | 😐    | Bit chunky. Can you split this next time?        |

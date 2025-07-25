@@ -45,8 +45,8 @@ public final class CommitQualityFrame {
         // If a repository is selected, compute the current commit quality
         if (repo != null) {
             com.voidtoverse.engine.QualityEngine.Result result = com.voidtoverse.engine.QualityEngine.calculateQuality(repo);
-            String[] desc = com.voidtoverse.engine.QualityDescriptor.describe(result.quality);
-            qualityLabel = new Label(desc[0] + " Commit Quality: " + result.quality + "% — \"" + desc[1] + "\"");
+            String[] desc = com.voidtoverse.engine.QualityDescriptor.describe(result.quality());
+            qualityLabel = new Label(desc[0] + " Commit Quality: " + result.quality() + "% — \"" + desc[1] + "\"");
             commitBtn.setDisable(false);
             advancedBtn.setDisable(false);
         } else {
@@ -101,7 +101,7 @@ public final class CommitQualityFrame {
             }
             // Recalculate quality after commit
             com.voidtoverse.engine.QualityEngine.Result r = com.voidtoverse.engine.QualityEngine.calculateQuality(repo);
-            int qualityValue = r.quality;
+            int qualityValue = r.quality();
             // if the commit message contains one of the exception keywords, force 100 quality
             String lower = message.toLowerCase();
             if (lower.startsWith("refactor:") || lower.contains("bulk rename") || lower.contains("initial commit")) {

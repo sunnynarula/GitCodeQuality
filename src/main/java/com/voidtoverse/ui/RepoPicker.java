@@ -62,9 +62,7 @@ public final class RepoPicker {
         javafx.scene.control.Button browseBtn = new javafx.scene.control.Button("Browse…");
         // Disable the Open button until the user selects an entry
         openBtn.setDisable(true);
-        listView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
-            openBtn.setDisable(newVal == null);
-        });
+        listView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> openBtn.setDisable(newVal == null));
         // This array will capture the user's selection from either the list or browse dialog
         final File[] selected = new File[1];
         // Handler for choosing an existing recent repository

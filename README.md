@@ -18,7 +18,7 @@ GitCodeQuality is a desktop helper for developers striving to craft small, well�
 
 To run the application you need a Java 17 runtime, JavaFX modules and the JGit library on the classpath. Compile the sources under `src/main/java` and launch `com.voidtoverse.Main`. On first launch you will see “No git repository selected”. Click the **Switch** button to choose a repository. Once a repository is selected, make changes, stage and commit them via the GUI. The quality banner will update after each commit.
 
-You can manage your Git user name and email via the standard `git config` commands. JGit honours your existing `.gitconfig` settings.
+You can manage your Git username and email via the standard `git config` commands. JGit honours your existing `.gitconfig` settings.
 
 ### Adding JGit to your build
 
